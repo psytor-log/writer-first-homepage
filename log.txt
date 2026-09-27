@@ -1,0 +1,118 @@
+[2026-09-27 03:05 KST] SEO 및 GitHub Pages 배포 준비
+- 사용 도구: codex, web
+- 사용자 요청: 구글·네이버 검색을 고려해 배포 가능 여부를 확인하고 배포한다.
+- 반영: canonical·Open Graph URL·WebSite JSON-LD·웹 매니페스트를 추가하고, 배포 URL을 받아 `robots.txt`, `sitemap.xml`, `feed.xml`을 생성하는 `scripts/generate-seo.mjs`와 GitHub Pages 워크플로를 구현했다. Home 글 목록은 `publishedAt` 내림차순으로 표시한다.
+- 검색 조사: Google Search Console의 사이트맵 제출과 네이버 서치어드바이저의 사이트맵·RSS 제출 절차를 공식 문서로 확인했다.
+- 검증: `npm.cmd run build`와 `node --check auth-worker/src/index.js` 통과. GitHub Pages URL을 가정한 빌드에서 canonical, base path, robots, sitemap 생성 결과를 확인했다. Vite의 500 kB 초과 번들 경고는 있으나 빌드 실패는 아니다.
+- 배포 상태: 기존 GitHub CLI 토큰이 만료되어 기기 인증을 시작했다. 사용자 GitHub 승인이 완료되면 새 저장소 생성과 Pages 배포를 이어서 진행한다.
+- 수정한 파일: package.json, vite.config.ts, index.html, src/App.tsx, src/components/ArchiveHome.tsx, src/content/homeContent.ts, src/styles.css, .env.example, .gitignore, public/site.webmanifest, scripts/generate-seo.mjs, .github/workflows/deploy.yml, README.md, DESIGN.md, project.meta.json, log.txt.
+- work.lock: 유지. 외부 GitHub 인증이 필요한 진행 중 작업이다.
+
+[2026-09-27 02:20 KST] 참조 이미지 기반 1:3:1 홈 디자인 재구성
+- 사용 도구: codex, frontend-design, view_image
+- 사용자 요청: `webpage design sample.png`를 참고해 1:3:1 레이아웃, 원형 사진, 좌측 카테고리 트리와 하단 타이틀, 우측 검색·인기 글·태그를 구현한다. 에디터는 유지하고, 세부 기능을 고려해 코드를 블록형으로 작성한다.
+- 반영: src/content/homeContent.ts에 홈페이지의 모든 표시 문구·카테고리·글·태그를 데이터 블록으로 분리하고, src/components/ArchiveHome.tsx에 좌측·중앙·우측 화면 블록을 분리했다.
+- 디자인: 데스크톱은 1:3:1 열 비율이며, 각 글의 사진은 object-fit과 border-radius: 50%로 원형 표기한다. 우측 검색은 현재 표시 글을 즉시 필터링한다.
+- 수정한 파일: src/App.tsx, src/components/ArchiveHome.tsx, src/content/homeContent.ts, src/styles.css, DESIGN.md, project.meta.json, log.txt.
+- 검증: `npm.cmd run build` 통과.
+- work.lock: 생성.
+- 작업 종료: 참조 이미지 기반 홈 레이아웃과 블록형 코드 구성을 완료했다.
+- work.lock: 삭제.
+
+[2026-09-27 02:10 KST] Andrea 참고 홈 디자인 재구성
+- 사용 도구: codex, frontend-design, web research
+- 사용자 요청: Colorlib Andrea 템플릿을 참고해 개인홈페이지의 웹디자인을 수정한다.
+- 참고 판단: Andrea는 왼쪽 고정 사이드바, 작가명 중심 타이포그래피, 최신 글의 원형 썸네일 목록을 사용한다. 이 구조를 개인 기록의 탐색과 최신 아카이브로 재해석했다.
+- 반영: 홈 화면을 고정 사이드바, 대형 제목, 2개 최신 글 행, 검정 카테고리 아카이브 목록으로 재구성했다. 작은 화면에서는 상단 바와 한 열 목록으로 전환한다.
+- 수정한 파일: DESIGN.md, src/App.tsx, src/styles.css, project.meta.json, log.txt.
+- 검증: `npm.cmd run build` 통과.
+- work.lock: 생성.
+- 작업 종료: 참조 디자인을 반영한 홈 화면 재구성을 완료했다.
+- work.lock: 삭제.
+
+[2026-09-27 02:00 KST] 디자인 변경 작업 중단
+- 사용 도구: codex
+- 사용자 지시: Lalasia 참고 디자인 변경 작업을 중단한다.
+- 처리 결과: 참조 사이트 조사는 수행했으나 DESIGN.md, src/App.tsx, src/styles.css에는 변경을 적용하지 않았다.
+- 수정한 파일: project.meta.json, log.txt.
+- work.lock: 생성 후 사용자 중단 지시에 따라 삭제.
+
+[2026-09-27 01:50 KST] Cloudflare Worker 관리자 인증 구현
+- 사용 도구: codex
+- 사용자 지시: Cloudflare 기반 관리자 인증 구현을 진행한다.
+- 구현: auth-worker/src/index.js에 로그인, 세션 확인, 로그아웃 API를 추가했다. ADMIN_USERNAME, ADMIN_PASSWORD, SESSION_SECRET은 Worker Secret으로만 읽고, 8시간 HttpOnly·Secure·SameSite=Strict 세션 쿠키를 발급한다.
+- 연결: .env.example과 프런트엔드의 VITE_AUTH_API_BASE_URL로 인증 Worker 공개 주소를 설정하도록 했다.
+- 보안 판단: 비밀번호는 소스·Git·프런트엔드 환경 변수에 두지 않고 Cloudflare Secret에만 입력한다. 같은 개인 도메인의 홈페이지와 API 하위 도메인을 권장한다.
+- 수정한 파일: auth-worker/*, .env.example, src/App.tsx, src/vite-env.d.ts, README.md, project.meta.json, log.txt.
+- 검증: `npm.cmd run build`, `node --check auth-worker/src/index.js` 통과.
+- 검토 필요: 실제 Cloudflare 계정에 Secret 입력과 Worker 배포, 공개 도메인 확정은 아직 수행하지 않았다.
+- work.lock: 생성.
+- 작업 종료: 인증 Worker 구현과 연결 문서 작성을 완료했다.
+- work.lock: 삭제.
+
+[2026-09-27 01:40 KST] 상단 메뉴 편집·관리자 인증·파비콘 추가
+- 사용 도구: codex
+- 사용자 요청: 상단 메뉴를 편집할 수 있게 하고, 에디터는 관리자 아이디와 비밀번호로만 접근하게 하며 파비콘을 넣는다.
+- 반영: 메뉴 편집은 관리자 글쓰기 경로 안에 유지하고, 홈의 관리자 글쓰기 버튼에서 서버 인증 API를 호출하는 로그인 화면을 추가했다. public/favicon.svg와 HTML favicon 링크를 추가했다.
+- 보안 판단: 정적 프런트엔드에 아이디·비밀번호를 저장하면 공개되므로 구현하지 않았다. 실제 보호는 `/api/auth/login` 서버와 HttpOnly 세션 쿠키가 필요하다.
+- 수정한 파일: index.html, public/favicon.svg, src/App.tsx, src/styles.css, README.md, project.meta.json, log.txt.
+- work.lock: 생성.
+- 검증: `npm.cmd run build` 통과.
+- 검토 필요: 실제 관리자 계정값과 배포 서버가 결정되면 인증 API를 구현·연결해야 한다.
+- 작업 종료: UI와 인증 연동 계약 반영을 완료했다.
+- work.lock: 삭제.
+
+[2026-09-27 01:30 KST] 상단 타이틀 영역 보정
+- 사용 도구: codex
+- 사용자 요청: 상단 타이틀 부분 전체에 검정 바탕과 흰색 폰트를 적용한다.
+- 반영: 메뉴 바에 한정하지 않고 홈의 첫 타이틀·소개 영역을 검정 패널로 확장하고 제목과 설명을 흰색 계열로 변경했다.
+- 수정한 파일: DESIGN.md, src/styles.css, project.meta.json, log.txt.
+- work.lock: 생성.
+- 검증: `npm.cmd run build` 통과.
+- 작업 종료: 상단 타이틀 영역 보정을 완료했다.
+- work.lock: 삭제.
+
+[2026-09-27 01:20 KST] 색상 방향 변경
+- 사용 도구: codex
+- 사용자 요청: 바탕색을 화이트로 바꾸고 상단을 검정색 배경과 흰색 글씨로 변경한다.
+- 반영: 공개 홈, 글쓰기 스튜디오의 상단 바를 #17202A와 흰색 글자로 통일하고, 전체 바탕을 #FFFFFF로 변경했다.
+- 수정한 파일: DESIGN.md, src/styles.css, project.meta.json, log.txt.
+- work.lock: 생성.
+- 검증: `npm.cmd run build` 통과.
+- 작업 종료: 디자인 변경을 완료했다.
+- work.lock: 삭제.
+
+[2026-09-27 00:00 KST] 작업 시작
+- 사용 도구: codex
+- 사용자 요청 요약: 기존 what-i-think를 대체할 새 개인 홈페이지를 별도 폴더에서 기획·화면정의·구현한다. 작성 편의성, 이미지 삽입 및 크기 편집, 글꼴 변경, 메뉴 트리 편집, 모바일, SEO와 AI 검색 친화성을 중시한다.
+- 입력값 누락: project_alias(한글 별명)는 아직 지정되지 않았다. 규칙에 따라 빈 문자열로 둔다.
+- 기본값 적용: 영문 프로젝트 폴더명은 writer-first-homepage로 정했다.
+- 사용자 컨펌 여부: 목표 컨펌 자동 진행(§0).
+- work.lock: 생성.
+- 작업 종료: 별명 반영을 완료했다.
+- work.lock: 삭제.
+- 기존 프로젝트 상태: what-i-think에 사용자 수정으로 보이는 변경 파일 1개가 있어 수정하지 않고 참고만 한다.
+
+[2026-09-27 01:00 KST] 기획·화면정의·프로토타입 구현
+- 사용 도구: codex, design-consultation 절차, web research
+- 자동 판단 근거: 사용자 요청에 이미 제품 목적, 벤치마킹, 조사, 구현 범위가 충분히 있어 기획을 작성하고 목표 컨펌은 §0에 따라 자동 진행했다.
+- 디자인 결정: Quiet Editorial Desk. 읽기 화면과 작성 캔버스의 본문 폭·타이포그래피를 맞추고, 사진 선택 시에만 크기·정렬·대체 텍스트 도구를 보이게 했다.
+- 벤치마킹: Maggie Appleton의 에세이/가든 구분, Derek Sivers의 글 중심 탐색, 네이버 SmartEditor ONE의 맥락형 사진 편집과 블록 이동 원칙을 반영했다.
+- 수정한 파일: README.md, DESIGN.md, docs/PLAN.md, docs/SCREEN_SPEC.md, package.json, Vite/TypeScript 설정, src/*, public/robots.txt, public/sitemap.xml, public/feed.xml.
+- SEO·AI 검색 판단: Google AI 검색에는 별도 AI 마크업이 필요하지 않으며 공개 원문 HTML, 색인 가능성, 내부 링크, 모바일 경험이 우선이다. ChatGPT 검색 후보가 되려면 OAI-SearchBot 접근을 막지 않는다. 노출과 추천은 보장하지 않는다.
+- 검증: `npm run build` 통과. TypeScript 검사와 Vite production build가 정상 완료됐다.
+- 검토 필요: 현재 저장은 브라우저 localStorage이며 실제 공개 발행·이미지 스토리지·도메인은 아직 연결하지 않았다. robots/sitemap/feed의 플레이스홀더는 배포 전에 실제 도메인으로 교체해야 한다.
+- 처리 실패 사유: 자동 브라우저 UI 검증은 이 세션에 제어 가능한 브라우저가 없어 실행하지 못했다. 빌드 검증으로 대체했다.
+- 개선 패턴: 글 작성 도구에서는 항상 보이는 기능을 줄이고, 선택한 블록에 필요한 조작만 노출한다.
+
+[2026-09-27 01:10 KST] 작업 종료
+- 사용 도구: codex
+- 작업 결과: 기획서, 화면정의서, 디자인 시스템, 글쓰기 스튜디오 프로토타입, 공개 읽기 홈, 메뉴 트리 편집 화면, 검색 기본 산출물을 작성했다.
+- 검증 결과: `npm.cmd run build` 통과. Vite가 production 산출물 생성까지 완료했다. 번들 크기 500kB 경고는 Tiptap 편집기 의존성에 따른 개선 후보이며 빌드를 실패시키지 않았다.
+- work.lock: 삭제.
+
+[2026-09-27 01:15 KST] 프로젝트 별명 확정
+- 사용 도구: codex
+- 사용자 입력: 프로젝트 별명으로 "개인홈페이지"를 지정했다.
+- 반영: project.meta.json의 project_alias를 "개인홈페이지"로 변경했다.
+- work.lock: 생성.

@@ -1,0 +1,14 @@
+User-agent: Googlebot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: GPTBot
+Disallow: /
+
+User-agent: *
+Allow: /
+
+# 배포 시 실제 공개 도메인으로 교체합니다.
+Sitemap: https://YOUR-DOMAIN.example/sitemap.xml

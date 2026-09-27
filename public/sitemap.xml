@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- 배포 시 실제 공개 도메인과 발행 글 URL로 자동 생성합니다. -->
+  <url>
+    <loc>https://YOUR-DOMAIN.example/</loc>
+  </url>
+</urlset>

@@ -1,0 +1,6 @@
+node_modules/
+dist/
+.env.local
+.wrangler/
+auth-worker/.dev.vars
+webpage design sample.png

@@ -1,0 +1,17 @@
+name = "personal-homepage-admin-auth"
+main = "src/index.js"
+compatibility_date = "2026-09-27"
+workers_dev = true
+
+[vars]
+# 배포한 홈페이지의 정확한 origin으로 교체합니다. 예: https://example.com
+ALLOWED_ORIGIN = "http://localhost:5173"
+
+# D1 데이터베이스를 만든 뒤 실제 database_id를 넣고 주석을 제거합니다.
+# [[d1_databases]]
+# binding = "MESSAGES"
+# database_name = "personal-homepage-messages"
+# database_id = "REPLACE_WITH_D1_DATABASE_ID"
+
+[secrets]
+required = ["ADMIN_USERNAME", "ADMIN_PASSWORD", "SESSION_SECRET", "ADMIN_EMAIL", "RESEND_API_KEY", "MESSAGE_FROM_EMAIL"]
