@@ -47,7 +47,7 @@ function corsHeaders(request, env) {
 }
 
 function json(request, env, body, status = 200, headers = {}) {
-  return new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json; charset=utf-8", ...corsHeaders(request, env), ...headers } });
+  return new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff", "Referrer-Policy": "no-referrer", ...corsHeaders(request, env), ...headers } });
 }
 
 function sessionCookie(value, maxAge = sessionLifetimeSeconds) {
@@ -60,6 +60,18 @@ function isAllowedOrigin(request, env) {
 
 function cleanText(value, maxLength) {
   return typeof value === "string" ? value.trim().slice(0, maxLength) : "";
+}
+
+async function isRateLimited(env, key, limit, windowMilliseconds) {
+  const now = Date.now();
+  const existing = await env.MESSAGES.prepare("SELECT window_started_at, request_count FROM request_limits WHERE key = ?").bind(key).first();
+  if (!existing || existing.window_started_at <= now - windowMilliseconds) {
+    await env.MESSAGES.prepare("INSERT INTO request_limits (key, window_started_at, request_count) VALUES (?, ?, 1) ON CONFLICT(key) DO UPDATE SET window_started_at = excluded.window_started_at, request_count = excluded.request_count").bind(key, now).run();
+    return false;
+  }
+  if (existing.request_count >= limit) return true;
+  await env.MESSAGES.prepare("UPDATE request_limits SET request_count = request_count + 1 WHERE key = ?").bind(key).run();
+  return false;
 }
 
 async function sendAdminNotification(env, entry) {
@@ -85,6 +97,8 @@ export default {
     if (url.pathname === "/api/auth/login" && request.method === "POST") {
       let credentials;
       try { credentials = await request.json(); } catch { return json(request, env, { error: "invalid_request" }, 400); }
+      const clientIp = request.headers.get("CF-Connecting-IP") || "unknown";
+      if (await isRateLimited(env, `login:${clientIp}`, 5, 15 * 60 * 1000)) return json(request, env, { error: "too_many_requests" }, 429);
       if (credentials.username !== env.ADMIN_USERNAME || credentials.password !== env.ADMIN_PASSWORD) return json(request, env, { error: "invalid_credentials" }, 401);
       const token = await createSession(env.SESSION_SECRET);
       return json(request, env, { authenticated: true }, 200, { "Set-Cookie": sessionCookie(token) });
@@ -105,6 +119,8 @@ export default {
       try { body = await request.json(); } catch { return json(request, env, { error: "invalid_request" }, 400); }
       const entry = { name: cleanText(body.name, 40), email: cleanText(body.email, 254), message: cleanText(body.message, 1000), isPrivate: body.isPrivate === true };
       if (!entry.name || !entry.email.includes("@") || !entry.message) return json(request, env, { error: "invalid_entry" }, 400);
+      const clientIp = request.headers.get("CF-Connecting-IP") || "unknown";
+      if (await isRateLimited(env, `guestbook:${clientIp}`, 3, 60 * 60 * 1000)) return json(request, env, { error: "too_many_requests" }, 429);
       const id = crypto.randomUUID();
       const createdAt = new Date().toISOString();
       await env.MESSAGES.prepare("INSERT INTO guestbook_messages (id, name, email, message, is_private, created_at) VALUES (?, ?, ?, ?, ?, ?)").bind(id, entry.name, entry.email, entry.message, entry.isPrivate ? 1 : 0, createdAt).run();

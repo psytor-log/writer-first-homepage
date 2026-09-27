@@ -42,6 +42,8 @@ npm.cmd run build
 
 GitHub Pages 배포는 `.github/workflows/deploy.yml`에 준비되어 있다. 새 GitHub 저장소의 기본 브랜치를 `main`으로 설정하고 Pages의 Source를 **GitHub Actions**로 선택하면, `main` 푸시마다 `https://계정명.github.io/저장소명/`으로 배포된다. 워크플로가 이 URL과 하위 경로를 자동 주입하므로 수동으로 사이트맵 도메인을 고칠 필요가 없다.
 
+커스텀 도메인을 연결할 경우 GitHub Actions Variables에 `SITE_URL=https://www.example.io`, `SITE_BASE_PATH=/`, `AUTH_API_BASE_URL=https://admin-api.example.io`를 저장한다. `www.example.io`는 GitHub Pages에, `admin-api.example.io`는 Cloudflare Worker에 연결해 같은 사이트로 운영한다.
+
 배포가 완료되어 실제 URL이 열린 뒤에는 아래 두 등록을 해야 검색 수집을 요청할 수 있다.
 
 1. [Google Search Console](https://search.google.com/search-console)에 URL-prefix 속성을 추가하고 소유권을 확인한 뒤 `sitemap.xml`을 제출한다.
@@ -78,7 +80,7 @@ npx wrangler secret put SESSION_SECRET
 npx wrangler deploy
 ```
 
-배포 뒤 `auth-worker/wrangler.toml`의 `ALLOWED_ORIGIN`을 홈페이지의 실제 origin으로 변경해 다시 배포한다. 그리고 프로젝트 루트에 `.env.local`을 만들고 Worker URL을 넣는다.
+배포 뒤 `auth-worker/wrangler.toml`의 `ALLOWED_ORIGIN`을 홈페이지의 실제 origin으로 변경해 다시 배포한다. GitHub Pages의 `github.io` 주소와 `workers.dev` 주소는 서로 다른 사이트여서 `SameSite=Strict` 관리자 세션 쿠키가 전송되지 않는다. 실제 관리자 로그인을 사용하려면 개인 도메인에서 `www.example.io`와 `admin-api.example.io`처럼 같은 등록 도메인의 하위 도메인으로 연결해야 한다.
 
 ```text
 VITE_AUTH_API_BASE_URL=https://personal-homepage-admin-auth.YOUR-SUBDOMAIN.workers.dev
@@ -100,3 +102,10 @@ npx wrangler deploy
 ```
 
 `ADMIN_USERNAME`과 `ADMIN_EMAIL`에는 같은 관리자 이메일을 설정하면 된다. `RESEND_API_KEY`와 발신 주소는 Resend에서 발급받아야 메일 알림이 발송된다.
+
+### 보안 운영 기준
+
+- 관리자 비밀번호는 16자 이상의 고유한 비밀번호로 설정하고 비밀번호 관리기에만 보관한다.
+- `SESSION_SECRET`은 32바이트 이상 무작위 값으로 생성해 Cloudflare secret으로만 저장한다.
+- 로그인은 IP당 15분에 5회, 방명록은 IP당 1시간에 3회로 서버 측 제한한다. 공개 운영 전에는 Cloudflare Turnstile도 추가해 자동 스팸을 막는 것을 권장한다.
+- GitHub Actions Variables에는 공개 URL만 저장한다. 관리자 비밀번호·세션 비밀값·Resend 키는 절대로 넣지 않는다.

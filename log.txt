@@ -1,3 +1,13 @@
+[2026-09-27 03:45 KST] 관리자 등록 경로·보안 취약성·커스텀 도메인 검토
+- 사용 도구: codex, web
+- 사용자 요청: 관리자 등록 절차, 해킹 취약성 검토, `.io` 또는 `.ai` 커스텀 도메인 전환 가능 여부를 확인한다.
+- 핵심 발견: 현재 `github.io` 공개 홈페이지와 `workers.dev` API는 서로 다른 사이트다. `SameSite=Strict` 세션 쿠키는 이 조합에서 관리자 API 요청에 전달되지 않으므로, 실제 로그인에는 `www.개인도메인`과 `admin-api.개인도메인`처럼 같은 등록 도메인의 하위 도메인 구성이 필요하다.
+- 보안 보강: 관리자 로그인 IP당 15분 5회, 방명록 IP당 1시간 3회 제한을 D1 기반으로 구현했다. JSON API에 `Cache-Control: no-store`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: no-referrer`를 추가했다. 커스텀 도메인·API URL을 GitHub Actions Variables로 전달하도록 워크플로를 변경했다.
+- 잔여 위험: CAPTCHA/Turnstile 미연결 상태에서는 분산 자동 스팸을 완전히 차단할 수 없다. 공개 운영 전 Turnstile 연결, 강한 관리자 비밀번호와 무작위 세션 비밀값, Cloudflare secret 사용이 필요하다.
+- 검증: `npm.cmd run build`, `node --check auth-worker/src/index.js`, `git diff --check` 통과. Vite 번들 크기 경고는 유지된다.
+- 수정한 파일: auth-worker/schema.sql, auth-worker/src/index.js, .github/workflows/deploy.yml, README.md, project.meta.json, log.txt.
+- work.lock: 작업 완료에 따라 삭제.
+
 [2026-09-27 03:20 KST] GitHub Pages 공개 배포 완료
 - 사용 도구: codex, GitHub CLI, GitHub Actions, PowerShell
 - 배포 주소: https://psytor-log.github.io/writer-first-homepage/

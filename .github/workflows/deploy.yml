@@ -26,8 +26,9 @@ jobs:
       - run: npm ci
       - run: npm run build
         env:
-          VITE_BASE_PATH: /${{ github.event.repository.name }}/
-          VITE_SITE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
+          VITE_BASE_PATH: ${{ vars.SITE_BASE_PATH || format('/{0}/', github.event.repository.name) }}
+          VITE_SITE_URL: ${{ vars.SITE_URL || format('https://{0}.github.io/{1}', github.repository_owner, github.event.repository.name) }}
+          VITE_AUTH_API_BASE_URL: ${{ vars.AUTH_API_BASE_URL }}
           VITE_NAVER_SITE_VERIFICATION: ${{ vars.NAVER_SITE_VERIFICATION }}
       - uses: actions/upload-pages-artifact@v3
         with:

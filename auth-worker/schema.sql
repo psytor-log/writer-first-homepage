@@ -9,3 +9,9 @@ CREATE TABLE IF NOT EXISTS guestbook_messages (
 
 CREATE INDEX IF NOT EXISTS guestbook_public_created_at
   ON guestbook_messages (is_private, created_at DESC);
+
+CREATE TABLE IF NOT EXISTS request_limits (
+  key TEXT PRIMARY KEY,
+  window_started_at INTEGER NOT NULL,
+  request_count INTEGER NOT NULL
+);
