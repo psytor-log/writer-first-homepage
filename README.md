@@ -68,6 +68,8 @@ GitHub Pages 배포는 `.github/workflows/deploy.yml`에 준비되어 있다. �
 
 정적 GitHub Pages만으로는 비밀번호를 안전하게 검증할 수 없다. 아이디·비밀번호를 프론트엔드 코드나 `VITE_*` 환경 변수에 넣으면 누구나 내려받아 볼 수 있으므로 금지한다. 실제 배포 전에는 Cloudflare Workers, Vercel Functions 또는 별도 서버 중 하나에 이 API와 비밀 환경 변수를 구성해야 한다.
 
+도메인을 아직 구매하지 않았다면, 관리자 등록 단계에서는 정적 파일과 API를 같은 `workers.dev` 주소에 임시 배포한다. 이 방식은 `SameSite=Strict` 세션 쿠키가 같은 출처에서만 전송되도록 보장한다. 개인 도메인을 연결하면 같은 Worker를 `admin-api.example.io`로 옮기고, 공개 홈페이지는 `www.example.io`로 연결한다.
+
 ### Cloudflare Worker 설정
 
 이 프로젝트에는 `auth-worker/`가 포함되어 있다. Cloudflare에 로그인한 터미널에서 다음 순서로 실행한다. 비밀번호는 명령 다음의 보안 입력 창에만 넣으며, 코드·Git·채팅에 쓰지 않는다.
@@ -101,7 +103,9 @@ npx wrangler secret put MESSAGE_FROM_EMAIL
 npx wrangler deploy
 ```
 
-`ADMIN_USERNAME`과 `ADMIN_EMAIL`에는 같은 관리자 이메일을 설정하면 된다. `RESEND_API_KEY`와 발신 주소는 Resend에서 발급받아야 메일 알림이 발송된다.
+관리자 등록을 먼저 할 때는 `ADMIN_USERNAME`, `ADMIN_PASSWORD`, `SESSION_SECRET`만 설정하면 된다. 방명록 메일 알림을 활성화할 때 `ADMIN_EMAIL`, `RESEND_API_KEY`, `MESSAGE_FROM_EMAIL`을 추가한다. `ADMIN_USERNAME`과 `ADMIN_EMAIL`에는 같은 관리자 이메일을 설정하면 된다.
+
+Cloudflare 대시보드에서는 반드시 **Encrypt** 유형의 Secret으로 등록한다. 일반 Variable로 등록하면 Worker 설정 조회·배포 과정에 노출될 수 있다. `ADMIN_PASSWORD`와 `SESSION_SECRET`을 일반 Variable로 입력한 적이 있다면 즉시 새 값으로 교체한다.
 
 ### 보안 운영 기준
 

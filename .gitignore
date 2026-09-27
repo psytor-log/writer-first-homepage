@@ -4,3 +4,7 @@ dist/
 .wrangler/
 auth-worker/.dev.vars
 webpage design sample.png
+
+.dev.vars*
+!.dev.vars.example
+!.env.example

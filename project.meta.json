@@ -4,7 +4,7 @@
   "project_type": "personal-homepage",
   "status": "진행중",
   "created_at": "2026-09-27T00:00:00+09:00",
-  "last_updated_at": "2026-09-27T03:45:00+09:00",
+  "last_updated_at": "2026-09-27T04:20:00+09:00",
   "goal": "글 작성자가 데스크톱과 모바일에서 이미지·서식·문단을 자연스럽게 편집하고, 방문자는 빠르고 읽기 쉬운 기록을 볼 수 있는 개인 홈페이지와 관리 도구를 새로 만든다.",
   "success_metrics": [
     "본문 편집기에서 이미지 삽입·드래그 크기 조절·폰트 및 문단 서식을 지원한다.",
@@ -19,8 +19,8 @@
     "빌드와 주요 동작 검증이 통과한다.",
     "작업 결과·검증 결과가 log.txt에 기록되어 있다."
   ],
-  "current_stage": "관리자 인증·방명록 보안 보강 및 커스텀 도메인 연결 설계 완료",
-  "next_action": "개인 도메인을 구매·검증한 뒤 GitHub Pages와 Cloudflare Worker를 같은 등록 도메인의 하위 도메인으로 연결하고 관리자 secret·D1·Resend를 설정한다.",
+  "current_stage": "Cloudflare D1·관리자 Worker 초기 배포 및 Secret 재설정 대기",
+  "next_action": "Cloudflare에서 ADMIN_PASSWORD와 SESSION_SECRET을 Encrypt Secret으로 새 값으로 등록한 뒤, ALLOWED_ORIGIN을 workers.dev 주소로 반영해 재배포하고 관리자 로그인을 검증한다.",
   "blocked_reason": "",
   "tags": ["personal-homepage", "editor", "seo", "ai-search"],
   "goal_confirmation": {
