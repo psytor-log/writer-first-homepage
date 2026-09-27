@@ -28,6 +28,7 @@ jobs:
         env:
           VITE_BASE_PATH: /${{ github.event.repository.name }}/
           VITE_SITE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
+          VITE_NAVER_SITE_VERIFICATION: ${{ vars.NAVER_SITE_VERIFICATION }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

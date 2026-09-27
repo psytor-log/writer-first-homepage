@@ -45,7 +45,7 @@ GitHub Pages 배포는 `.github/workflows/deploy.yml`에 준비되어 있다. �
 배포가 완료되어 실제 URL이 열린 뒤에는 아래 두 등록을 해야 검색 수집을 요청할 수 있다.
 
 1. [Google Search Console](https://search.google.com/search-console)에 URL-prefix 속성을 추가하고 소유권을 확인한 뒤 `sitemap.xml`을 제출한다.
-2. [네이버 서치어드바이저](https://searchadvisor.naver.com/)에 같은 사이트를 등록한다. 제공받은 확인 코드를 `VITE_NAVER_SITE_VERIFICATION`에 넣어 다시 배포한 후, `sitemap.xml`과 `feed.xml`을 각각 제출한다.
+2. [네이버 서치어드바이저](https://searchadvisor.naver.com/)에 같은 사이트를 등록한다. 제공받은 확인 코드를 GitHub 저장소의 **Settings → Secrets and variables → Actions → Variables**에서 `NAVER_SITE_VERIFICATION`으로 저장해 재배포한 후, `sitemap.xml`과 `feed.xml`을 각각 제출한다.
 
 검색 반영 시점과 순위는 보장할 수 없다. 새 글마다 공개 URL, 본문 HTML, 고유 제목·설명·대표 이미지·`Article` JSON-LD를 생성하고 사이트맵/RSS에 추가해야 개별 글도 검색 결과에 안정적으로 노출된다.
 
