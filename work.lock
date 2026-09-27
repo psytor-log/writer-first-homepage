@@ -1,9 +1,0 @@
-{
-  "locked_by": "codex",
-  "task": "무료 가변 폰트·Home·공개/비공개 방명록·메일 알림 구현",
-  "started_at": "2026-09-27T02:35:00+09:00",
-  "last_activity_at": "2026-09-27T02:35:00+09:00",
-  "status": "in_progress",
-  "target_files": ["index.html", "src", "auth-worker", "README.md", "DESIGN.md", "project.meta.json", "log.txt"],
-  "summary": "SUIT Variable을 적용하고 홈 기본 진입과 공개/비공개 방명록, 관리자 전용 이메일, 메일 알림 API를 구현한다."
-}

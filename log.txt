@@ -1,3 +1,12 @@
+[2026-09-27 03:20 KST] GitHub Pages 공개 배포 완료
+- 사용 도구: codex, GitHub CLI, GitHub Actions, PowerShell
+- 배포 주소: https://psytor-log.github.io/writer-first-homepage/
+- 저장소: https://github.com/psytor-log/writer-first-homepage
+- 처리: GitHub 기기 인증 후 공개 저장소를 생성하고 `main` 브랜치에 푸시했다. GitHub Pages를 GitHub Actions 방식으로 활성화했다. 활성화 이전 첫 워크플로는 404로 실패했으나, Pages 활성화 후 재실행한 워크플로 `36317851745`는 build·deploy 모두 성공했다.
+- 검증: 홈페이지, `robots.txt`, `sitemap.xml`, `feed.xml`이 모두 HTTP 200으로 응답한다. robots는 Googlebot·NaverBot·OAI-SearchBot 수집을 허용하고 GPTBot은 차단한다. sitemap의 실제 공개 URL을 확인했다.
+- 검토 필요: 검색 결과 노출은 Search Console 및 네이버 서치어드바이저에서 소유권 확인과 sitemap/RSS 제출 후 검색엔진 수집 시간을 거쳐야 한다. 현재 에디터의 발행 저장소 연동 전에는 개별 글 URL·정적 본문·Article JSON-LD가 생성되지 않는다.
+- work.lock: 작업 완료에 따라 삭제.
+
 [2026-09-27 03:05 KST] SEO 및 GitHub Pages 배포 준비
 - 사용 도구: codex, web
 - 사용자 요청: 구글·네이버 검색을 고려해 배포 가능 여부를 확인하고 배포한다.
